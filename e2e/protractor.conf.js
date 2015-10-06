@@ -31,26 +31,27 @@ var protractorConfig = {
     directConnect: true,
 
     params: {
+        page_timeout: 3000,
         users: {
             national_admin: {
                 username: "10001",
-                password: "national_admin"
+                password: "password1"
             },
             chrio: {
                 username: "10007",
-                password: "nairobi"
+                password: "password1"
             },
             schrio: {
                 username: "10012",
-                password: "mathare"
+                password: "password1"
             },
             regulator: {
                 username: "10014",
-                password: "kmpdb"
+                password: "password1"
             },
             reporting: {
                 username: "reporting@mfltest.slade360.co.ke",
-                password: "reporting"
+                password: "password1"
             },
             public_user: {
                 username: "public@mfltest.slade360.co.ke",
@@ -58,7 +59,7 @@ var protractorConfig = {
             },
             facility_officer: {
                 username: "facility_officer@mfltest.slade360.co.ke",
-                password: "facility_officer"
+                password: "password1"
             }
         }
     }

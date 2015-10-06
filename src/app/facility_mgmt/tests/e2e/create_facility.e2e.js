@@ -1,14 +1,14 @@
 (function () {
     "use strict";
 
-    xdescribe("mflAdminApp scenario tests for creating facility:", function() {
+    ddescribe("mflAdminApp scenario tests for creating facility:", function() {
 
         //variable required in test
         var test_utils = require("../../../common/tests/utils.e2e.js");
         var facility = test_utils.getRandomString(25);
         var enter = browser.actions().sendKeys(protractor.Key.ENTER);
 
-        it("should log in as starehe schrio and load the dashboard", function() {
+        iit("should log in as starehe schrio and load the dashboard", function() {
             test_utils.loginUser(
                 browser,
                 browser.params.users.schrio.username,
@@ -16,11 +16,11 @@
             );
         });
 
-        it("should fill in new facility screen | basic details", function() {
+        iit("should fill in new facility screen | basic details", function() {
 
             //navigation
-            browser.get("/#/facilities/create/basic/?furthest=1");
-            browser.driver.sleep(1000);
+            browser.get("/#/facility_list/create/basic/?furthest=1");
+            browser.driver.sleep(browser.params.page_timeout);
 
             var official_name = element(by.name("official_name"));
             official_name.clear().then(function () {
@@ -102,17 +102,17 @@
             geolocationBtn.click();
 
             //interations
-            browser.driver.sleep(1000);
             browser.waitForAngular();
+            browser.driver.sleep(browser.params.page_timeout);
 
             //expectations
             expect(element(by.css("h4")).getText()).toEqual("Geolocation Details");
         });
 
-        it("should fill in new facility screen | geolocation details",function () {
+        iit("should fill in new facility screen | geolocation details",function () {
             browser.refresh();
-            browser.driver.sleep(1000);
             browser.waitForAngular();
+            browser.driver.sleep(browser.params.page_timeout);
 
             var geo_source = element(by.name("source"));
             geo_source.element(by.css(".caret")).click();
@@ -130,19 +130,14 @@
             expect(contactsBtn.getText()).toEqual("Facility Contacts");
             contactsBtn.click();
 
-            browser.refresh();
-            browser.driver.sleep(1000);
             browser.waitForAngular();
+            browser.driver.sleep(browser.params.page_timeout);
 
-            //interations
-            contactsBtn.click();
-            browser.driver.sleep(1000);
-            browser.waitForAngular();
             //expectations
             expect(element(by.css("h4")).getText()).toEqual("Facility Contact");
         });
 
-        xit("should fill in new facility screen | facility contacts",function () {
+        iit("should fill in new facility screen | facility contacts",function () {
             element(by.name("cont_fac.type"))
                 .element(by.cssContainingText("option", "MOBILE")).click();
 
@@ -153,8 +148,8 @@
             contactsBtn.click();
 
             //interations
-            browser.driver.sleep(1500);
             browser.waitForAngular();
+            browser.driver.sleep(browser.params.page_timeout);
 
             //expectations
             expect(element(by.css("h4")).getText()).toEqual("Facility Regulation");
@@ -165,15 +160,15 @@
 
             element(by.model("fac_dept.regulating_body"))
                 .element(by.cssContainingText("option", "Ministry of Health")).click();
-            browser.driver.sleep(5000);
+            browser.driver.sleep(browser.params.page_timeout);
 
             var servicesBtn = element(by.linkText("Facility Services"));
             expect(servicesBtn.getText()).toEqual("Facility Services");
             servicesBtn.click();
 
             //interations
-            browser.driver.sleep(1500);
             browser.waitForAngular();
+            browser.driver.sleep(browser.params.page_timeout);
 
             //expectations
             expect(element(by.css("h4")).getText()).toEqual("Facility Regulation");
