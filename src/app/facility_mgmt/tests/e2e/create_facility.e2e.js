@@ -8,7 +8,7 @@
         var facility = test_utils.getRandomString(25);
         var enter = browser.actions().sendKeys(protractor.Key.ENTER);
 
-        iit("should log in as starehe schrio and load the dashboard", function() {
+        it("should log in as starehe schrio and load the dashboard", function() {
             test_utils.loginUser(
                 browser,
                 browser.params.users.schrio.username,
@@ -16,7 +16,7 @@
             );
         });
 
-        iit("should fill in new facility screen | basic details", function() {
+        it("should fill in new facility screen | basic details", function() {
 
             //navigation
             browser.get("/#/facility_list/create/basic/?furthest=1");
@@ -109,7 +109,7 @@
             expect(element(by.css("h4")).getText()).toEqual("Geolocation Details");
         });
 
-        iit("should fill in new facility screen | geolocation details",function () {
+        it("should fill in new facility screen | geolocation details",function () {
             browser.refresh();
             browser.waitForAngular();
             browser.driver.sleep(browser.params.page_timeout);
@@ -137,7 +137,7 @@
             expect(element(by.css("h4")).getText()).toEqual("Facility Contact");
         });
 
-        iit("should fill in new facility screen | facility contacts",function () {
+        it("should fill in new facility screen | facility contacts",function () {
             element(by.name("cont_fac.type"))
                 .element(by.cssContainingText("option", "MOBILE")).click();
 
@@ -155,23 +155,37 @@
             expect(element(by.css("h4")).getText()).toEqual("Facility Regulation");
         });
 
-        xit("should fill in new facility screen | facility regulation",function () {
-            element(by.model("fac_dept.name")).sendKeys("Radiology Unit");
+        it("should fill in new facility screen | facility regulation",function () {
+            element(by.linkText("Add")).click();
+            element.all(by.name("department_name")).first()
+                .element(by.cssContainingText("option", "Optical")).click();
 
-            element(by.model("fac_dept.regulating_body"))
-                .element(by.cssContainingText("option", "Ministry of Health")).click();
-            browser.driver.sleep(browser.params.page_timeout);
-
-            var servicesBtn = element(by.linkText("Facility Services"));
-            expect(servicesBtn.getText()).toEqual("Facility Services");
-            servicesBtn.click();
+            element(by.linkText("Facility Services")).click();
 
             //interations
             browser.waitForAngular();
             browser.driver.sleep(browser.params.page_timeout);
 
             //expectations
-            expect(element(by.css("h4")).getText()).toEqual("Facility Regulation");
+            expect(element.all(by.css("h4")).first().getText()).toEqual("Categories");
+        });
+
+        it("should fill in new facility screen | facility services",function () {
+            element(by.model("category.query")).sendKeys("hiv");
+            element(by.cssContainingText("span", "HIV/AIDS Services - Treatment and Care")).click();
+
+            element.all(by.css("input[type='checkbox']")).click();
+
+            browser.waitForAngular();
+            browser.driver.sleep(browser.params.page_timeout);
+
+            element(by.buttonText("Submit")).click();
+            browser.waitForAngular();
+            browser.driver.sleep(browser.params.page_timeout);
+
+            element(by.css("h3")).getText().then(function (x) {
+                expect(x.indexOf(" | "+facility.toUpperCase())).not.toEqual(-1);
+            });
         });
 
         it("logout user after tests",function () {
