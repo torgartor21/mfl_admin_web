@@ -31,7 +31,7 @@ var protractorConfig = {
     directConnect: true,
 
     params: {
-        page_timeout: 3000,
+        page_timeout:  parseInt(process.env.E2E_PAGE_TIMEOUT) || 3000,
         users: {
             national_admin: {
                 username: "10001",

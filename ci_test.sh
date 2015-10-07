@@ -44,8 +44,9 @@ function run_e2e(){
 
 case $CIRCLE_NODE_INDEX in
 0)
-
     export RUN_SAUCE_TESTS=true
+    export E2E_PAGE_TIMEOUT=5000
+
     grunt test:unit
 
     run_backend
