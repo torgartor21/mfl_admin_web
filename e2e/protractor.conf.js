@@ -10,10 +10,8 @@ var protractorConfig = {
     getPageTimeout: 2000,
 
     multiCapabilities: [
-        {
-            browserName: "chrome"
-        }
-        // { browserName: "firefox" }
+        { "browserName": "chrome" },
+        { "browserName": "firefox" }
     ],
 
     baseUrl: "http://localhost:8062/",
