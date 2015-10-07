@@ -46,6 +46,7 @@ case $CIRCLE_NODE_INDEX in
 0)
     export RUN_SAUCE_TESTS=true
     export E2E_PAGE_TIMEOUT=5000
+    export DEFAULT_TIMEOUT_INTERVAL=60000
 
     grunt test:unit
 

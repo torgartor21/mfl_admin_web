@@ -22,7 +22,7 @@ var protractorConfig = {
 
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 30000,
+        defaultTimeoutInterval: parseInt(process.env.DEFAULT_TIMEOUT_INTERVAL, 10) || 30000,
         isVerbose: true,
         includeStackTrace: true,
         realtimeFailure: false
