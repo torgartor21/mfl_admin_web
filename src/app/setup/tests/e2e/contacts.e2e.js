@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    describe("mflAdminApp scenario tests for contact types:", function() {
+    ddescribe("mflAdminApp scenario tests for contact types:", function() {
 
         //variable required in test
         var test_utils = require("../../../common/tests/utils.e2e.js");
@@ -24,7 +24,7 @@
             //navigation
             browser.get("/#/setup/contact_types/create");
             browser.waitForAngular(); //navigation to create
-            browser.driver.sleep(3000);
+            browser.driver.sleep(browser.params.page_timeout);
 
             //interaction setup
 
@@ -36,7 +36,7 @@
             contact_type_input_name.sendKeys(contact_type);
             contact_type_textarea_desc.sendKeys(contact_type_desc);
             contact_type_save_btn.click(); //saves contact_type
-            browser.driver.sleep(1000);
+            browser.driver.sleep(browser.params.page_timeout);
             browser.waitForAngular(); //navigation to list page
 
             //expectations
@@ -49,7 +49,7 @@
 
             //navigation
             browser.get("/#/setup/contact_types");
-            browser.driver.sleep(1000);
+            browser.driver.sleep(browser.params.page_timeout);
             browser.waitForAngular(); //navigation to list page
 
             //interaction setup
@@ -70,7 +70,7 @@
 
             //interaction
             view_btn.click();
-            browser.driver.sleep(1000);
+            browser.driver.sleep(browser.params.page_timeout);
             browser.waitForAngular();  //navigation to detail page
 
             //expectations
@@ -99,7 +99,7 @@
             });
             expect(contact_type_save_btn.getText()).toEqual("Save");
             contact_type_save_btn.click();
-            browser.driver.sleep(1000);
+            browser.driver.sleep(browser.params.page_timeout);
             browser.waitForAngular();//navigates to list page
 
             contact_typeNameEl = element.all(by.repeater("contact_type in contact_types")
@@ -113,7 +113,7 @@
 
             //navigation
             browser.get("/#/setup/contact_types");
-            browser.driver.sleep(1500);
+            browser.driver.sleep(browser.params.page_timeout);
             browser.waitForAngular(); //navigation to list page
 
             //interation setup
@@ -122,7 +122,7 @@
 
             //interaction
             view_btn.click();
-            browser.driver.sleep(1000);
+            browser.driver.sleep(browser.params.page_timeout);
             browser.waitForAngular();  //navigation to detail
 
             //interaction setup
@@ -131,11 +131,11 @@
             //interaction
             contact_type_del_btn.click();
             browser.waitForAngular(); //navigation to delete page
-            browser.driver.sleep(1000);
+            browser.driver.sleep(browser.params.page_timeout);
 
             del_btn = element(by.id("del_btn"));
             del_btn.click();
-            browser.driver.sleep(1500);
+            browser.driver.sleep(browser.params.page_timeout);
             browser.waitForAngular();//goes back to list page
 
             //expectations
