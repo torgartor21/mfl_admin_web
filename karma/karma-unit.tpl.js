@@ -159,8 +159,8 @@ module.exports = function ( karma ) {
         karma_config.browserDisconnectTimeout = 30000;
         karma_config.captureTimeout = 120000;
         karma_config.sauceLabs = {
-            testName: "MFL Admin App JS Unit Testing",
-            recordScreenshots: false
+            "testName": "MFL Admin App JS Unit Testing",
+            "recordScreenshots": false
         };
         karma_config.browsers = karma.browsers.concat(
             Object.keys(karma_config.customLaunchers)
