@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    ddescribe("mflAdminApp scenario tests for towns:", function() {
+    describe("mflAdminApp scenario tests for towns:", function() {
 
         //variable required in test
         var test_utils = require("../../../common/tests/utils.e2e.js");

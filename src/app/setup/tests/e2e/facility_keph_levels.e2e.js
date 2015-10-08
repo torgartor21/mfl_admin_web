@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    ddescribe("mflAdminApp scenario tests for facility keph levels:", function() {
+    describe("mflAdminApp scenario tests for facility keph levels:", function() {
 
         //variable required in test
         var test_utils = require("../../../common/tests/utils.e2e.js");

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    ddescribe("mflAdminApp scenario tests for geo code sources:", function() {
+    describe("mflAdminApp scenario tests for geo code sources:", function() {
 
         //variable required in test
         var test_utils = require("../../../common/tests/utils.e2e.js");
