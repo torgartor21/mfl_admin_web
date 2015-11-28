@@ -1,33 +1,220 @@
 (function (angular, _) {
     "use strict";
 
+    /**
+     * @ngdoc module
+     *
+     * @name mfl.users.controllers.users
+     *
+     * @description
+     * Contains all the controllers used to manage the users
+     */
     angular.module("mfl.users.controllers.users", [
         "mfl.auth.services",
         "mfl.users.services",
         "ui.router",
-        "mfl.common.forms"
+        "mfl.common.forms",
+        "mfl.common.errors"
     ])
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_create
+     *
+     * @description
+     * The parent controller managing creation of users
+     */
     .controller("mfl.users.controllers.user_create", ["$scope", "$state",
         "$stateParams", "mfl.common.services.multistep",
-        "mfl.users.services.wrappers","$log","mfl.auth.services.login","mfl.users.services.groups",
-        function ($scope, $state, $stateParams, multistepService, wrappers,$log,loginService,
-        groupsService) {
-            $scope.title = {
-                icon : "fa-plus-circle",
-                name : "New User"
+        "mfl.users.services.wrappers","$log","mfl.auth.services.login",
+        "mfl.users.services.groups", "toasty",
+        function ($scope, $state, $stateParams, multistepService, wrappers,
+            $log,loginService, groupsService, toasty) {
+            $scope.addLine = function (obj_str) {
+                switch(obj_str){
+                case "contacts" :
+                    $scope.user.contacts.push({
+                        contact_type : "",
+                        contact_text : ""
+                    });
+                    break;
+                case "groups" :
+                    $scope.user.groups.push({name : ""});
+                    break;
+                case "counties" :
+                    $scope.user.user_counties.push({county : ""});
+                    break;
+                case "constituencies" :
+                    $scope.user.user_constituencies.push({constituency :""});
+                    break;
+                case "regbody" :
+                    $scope.user.regulatory_users.push({regulatory_body : ""});
+                    break;
+                }
+            };
+            $scope.grpChecker = function () {
+                $scope.county_counter = 0;
+                $scope.regulator_counter = 0;
+                $scope.show_county = false;
+                $scope.show_regulator = false;
+                if($scope.user.groups.length > 0){
+                    _.each($scope.user.groups, function (usr_grp) {
+                        var curr_grp = _.findWhere(
+                            $scope.groups, {id : parseInt(usr_grp.id, 10)});
+                        if(curr_grp.is_national === false) {
+                            $scope.county_counter += 1;
+                        }
+                        if(curr_grp.is_regulator === true){
+                            $scope.regulator_counter += 1;
+                        }
+                    });
+                    if($scope.county_counter > 0){$scope.show_county = true;}
+                    if($scope.regulator_counter > 0){
+                        $scope.show_regulator = true;
+                    }
+                }
+            };
+            $scope.inactivate = function (obj, obj_str) {
+                var active_obj = {};
+                var active_key = JSON.stringify(obj_str);
+                if(obj_str === "user_constituencies"){
+                    active_obj[active_key] = $scope.user.user_constituencies;
+                }
+                else if(obj_str === "user_counties"){
+                    active_obj[active_key] = $scope.user.user_counties;
+                }
+                else if(obj_str === "regulatory_users"){
+                    active_obj[active_key] = $scope.user.regulatory_users;
+                }
+                wrappers.users.update($scope.user_id, active_obj)
+                    .success(function (){})
+                    .error(function (data) {
+                        $scope.errors = data;
+                    });
+            };
+            $scope.removeItems = function (parent_obj, child_obj) {
+                var modified;
+                modified = _.without(parent_obj, child_obj);
+                return modified;
+            };
+            $scope.removeLine = function (obj_str, obj) {
+                switch(obj_str){
+                case "contacts" :
+                    if(_.isUndefined(obj.id)){
+                        $scope.user.contacts = _.without(
+                            $scope.user.contacts, obj);
+                    }else{
+                        wrappers.user_contacts.remove(obj.id)
+                        .success(function () {
+                            wrappers.contacts.remove(obj.contact)
+                            .success(function () {
+                                $scope.user.contacts = _.without(
+                                    $scope.user.contacts, obj);
+                            })
+                            .error(function (data) {
+                                $scope.errors = data;
+                            });
+                        })
+                        .error(function (data) {
+                            $scope.errors = data;
+                        });
+                    }
+                    break;
+                case "groups" :
+                    $scope.user.groups = $scope.removeItems($scope.user.groups, obj, "groups");
+                    $scope.grpChecker();
+                    break;
+                case "counties" :
+                    $scope.user.user_counties = $scope.removeItems(
+                        $scope.user.user_counties, obj, "user_counties");
+                    break;
+                case "constituencies" :
+                    $scope.user.user_constituencies = $scope.removeItems(
+                        $scope.user.user_constituencies, obj,
+                        "user_constituencies");
+                    break;
+                case "regbody" :
+                    $scope.user.regulatory_users = $scope.removeItems(
+                        $scope.user.regulatory_users, obj, "regulatory_users");
+                    break;
+                }
+            };
+            $scope.save = function () {
+                _.each($scope.user.groups, function (new_grps) {
+                    var curr_grp = _.findWhere(
+                        $scope.groups, {id : parseInt(new_grps.id, 10)});
+                    new_grps.name = curr_grp.name;
+                });
+                if($scope.create){
+                    wrappers.users.create($scope.user)
+                        .success(function () {
+                            toasty.success({
+                                title: "Email sent",
+                                msg: "An email has been sent to the new user"
+                            });
+                            toasty.success({
+                                title: "User Added",
+                                msg: "User added successfully"
+                            });
+                            $state.go("users");
+                        })
+                        .error(function (data) {
+                            $log.error(data);
+                            $scope.errors = data;
+                        });
+                }else{
+                    wrappers.users.update($scope.user_id, $scope.user)
+                        .success(function () {
+                            toasty.success({
+                                title: "User Updates",
+                                msg: "User updated successfully"
+                            });
+                            $state.go("users");
+                        })
+                        .error(function (data) {
+                            $log.error(data);
+                            $scope.errors = data;
+                        });
+                }
             };
             $scope.tab = 0;
-            $scope.create = true;
-            if(!_.isEmpty($state.params.user_id)) {
-                wrappers.users.get($state.params.user_id)
+            if(_.isUndefined($stateParams.user_id)) {
+                $scope.create = true;
+                $scope.title = {
+                    icon : "fa-plus-circle",
+                    name : "New User"
+                };
+                $scope.groups = "";
+                $scope.group_obj = [
+                    {
+                        new_grp : ""
+                    }
+                ];
+                //Declaration of user object
+                $scope.user = {
+                    contacts : [],
+                    groups : [],
+                    user_counties : [],
+                    user_constituencies : [],
+                    regulatory_users : []
+                };
+            }else{
+                $scope.create = false;
+                $scope.title = {
+                    icon: "fa-edit",
+                    name: "Edit User"
+                };
+                wrappers.users.get($stateParams.user_id)
                 .success(function (data) {
                     $scope.user = data;
                     $scope.current_group = groupsService.checkWhichGroup($scope.user.groups);
                 })
                 .error(function (data) {
-                    $log.error(data);
+                    $scope.errors = data;
                 });
+                $scope.user_id = $stateParams.user_id;
+                $scope.wrapper = wrappers.users;
             }
             $scope.new_user = $state.params.user_id;
             $scope.furthest = $stateParams.furthest;
@@ -78,13 +265,30 @@
                 }
             };
             $scope.login_user = loginService.getUser();
+            wrappers.job_titles.list()
+            .success(function (data) {
+                $scope.job_titles = data.results;
+            })
+            .error(function (data) {
+                $scope.errors = data;
+            });
         }
     ])
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_create.basic
+     *
+     * @description
+     * The child controller managing basic details of users when creating new users.
+     * It's parent is 'mfl.users.controllers.user_create'
+     */
     .controller("mfl.users.controllers.user_create.basic",
         ["$scope", "$log", "$state", "mfl.users.services.wrappers",
-        "mfl.common.forms.changes",
-        function ($scope, $log, $state, wrappers, formChanges) {
+        "mfl.common.forms.changes", "PWD_RULE",
+        function ($scope, $log, $state, wrappers, formChanges, PR) {
+            $scope.PWD_RULE = PR;
             $scope.create = true;
             $scope.title = {
                 icon : "fa-plus-circle",
@@ -118,9 +322,8 @@
                 }
                 else {
                     wrappers.users.create($scope.user)
-                    .success(function (data) {
-                        $state.go("users.user_create.contacts",
-                            {user_id: data.id, furthest : $scope.furthest});
+                    .success(function () {
+                        $state.go("users");
                     })
                     .error(function (data) {
                         $log.error(data);
@@ -130,7 +333,15 @@
             };
         }]
     )
-    //end of assigning admininstrative areas to users
+
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_edit
+     *
+     * @description
+     * The parent controller managing editting of user records
+     */
     .controller("mfl.users.controllers.user_edit",
         ["$scope", "$stateParams", "$log", "mfl.users.services.wrappers",
          "$state","mfl.auth.services.login", "mfl.common.services.multistep",
@@ -154,7 +365,6 @@
             ];
             $scope.user_id = $stateParams.user_id;
             $scope.wrapper = wrappers.users;
-
             $scope.create = false;
             $scope.tabState = function(obj) {
                 _.each($scope.steps, function (step) {
@@ -194,12 +404,22 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_edit.basic
+     *
+     * @description
+     * The child controller that edits basic details of user records.
+     * It's parent controller is 'mfl.users.controllers.user_edit'
+     */
     .controller("mfl.users.controllers.user_edit.basic",
         ["$scope", "$log", "mfl.common.forms.changes",
         "mfl.users.services.wrappers", "mfl.common.services.multistep",
-        "$state","toasty",
+        "$state","toasty", "PWD_RULE",
         function ($scope, $log, formChanges, wrappers, multistepService,
-            $state,toasty) {
+            $state,toasty, PR) {
+            $scope.PWD_RULE = PR;
             multistepService.filterActive(
                 $scope, $scope.steps, $scope.steps[0]);
             $scope.save = function (frm) {
@@ -227,6 +447,15 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_edit.contacts
+     *
+     * @description
+     * The child controller that edits contacts of users.
+     * It's parent controller is 'mfl.users.controllers.user_edit'
+     */
     .controller("mfl.users.controllers.user_edit.contacts",
         ["$scope", "$log", "mfl.users.services.wrappers", "$state",
         "mfl.common.services.multistep","toasty",
@@ -255,7 +484,7 @@
                 $scope, $scope.steps, $scope.steps[1]);
             }
             $scope.user_id = $scope.user_id || $state.params.user_id;
-            wrappers.contact_types.list()
+            wrappers.contact_types.filter({"fields":"id,name"})
                 .success(function (data) {
                     $scope.contact_types = data.results;
                 })
@@ -327,6 +556,15 @@
         }
     ])
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_edit.groups
+     *
+     * @description
+     * The child controller that manages assignment of groups to users
+     * It's parent controller is 'mfl.users.controllers.user_edit'
+     */
     .controller("mfl.users.controllers.user_edit.groups",
         ["mfl.users.services.wrappers", "$log", "$scope", "$state",
         "mfl.common.services.multistep","mfl.users.services.groups","toasty",
@@ -340,7 +578,7 @@
             }
             wrappers.groups.filter({page_size: 100, ordering: "name"})
             .success(function (data) {
-                $scope.groups =  groupsService.filterGroups(
+                $scope.$parent.groups =  groupsService.filterGroups(
                     $scope.login_user.is_national, data.results);
             })
             .error(function (data) {
@@ -394,6 +632,15 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_edit.counties
+     *
+     * @description
+     * The child controller that manages assignment of counties to users
+     * It's parent controller is 'mfl.users.controllers.user_edit'
+     */
     .controller("mfl.users.controllers.user_edit.counties",
         ["mfl.users.services.wrappers", "$log", "$scope", "$state",
         "mfl.common.services.multistep",
@@ -456,6 +703,15 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_edit.regulatory_body
+     *
+     * @description
+     * The child controller that manages assignment of regulatory_bodies to users
+     * It's parent controller is 'mfl.users.controllers.user_edit'
+     */
     .controller("mfl.users.controllers.user_edit.regulatory_body",
         ["mfl.users.services.wrappers", "$log", "$scope",
         "mfl.common.services.multistep","$state",
@@ -517,6 +773,15 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_edit.constituency
+     *
+     * @description
+     * The child controller that manages assignment of constituencies to users
+     * It's parent controller is 'mfl.users.controllers.user_edit'
+     */
     .controller("mfl.users.controllers.user_edit.constituency",
         ["mfl.users.services.wrappers", "$log", "$scope",
         "mfl.common.services.multistep","$state",
@@ -579,6 +844,14 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.users.controllers.user_list
+     *
+     * @description
+     * Controls displaying the user listing
+     */
     .controller("mfl.users.controllers.user_list", ["$scope", function ($scope) {
         $scope.tooltip = {
             "title": "",

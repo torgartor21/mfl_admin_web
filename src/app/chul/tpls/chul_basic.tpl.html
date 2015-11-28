@@ -2,19 +2,22 @@
     <form name="frm_unit_basic" ng-submit="save(frm_unit_basic)" novalidate>
     <div class="col-xs-12 pad-0 custom-well">
         <div class="col-xs-12">
-            <h4 class="margin-b-10 fw-600">Community Unit Basic Details</h4>
+            <h4 class="margin-b-10 fw-600">
+                Community Health Unit Basic Details
+            </h4>
         </div>
+        <br><br>
         <drf-err-msg></drf-err-msg>
         <div class="form-group col-xs-12 margin-b-0">
           <p class="lead col-xs-12 pad-0">
-            <label class="control-label fs-16 fw-600 margin-t-5">Community Unit Code: </label>
+            <label class="control-label fs-16 fw-600 margin-t-5">Community Health Unit Code: </label>
               <span class="label label-info fs-15">{{create ?  'Automatically generated after creating unit' : unit.code}}
               </span>
           </p>
         </div>
         <div class="form-group col-xs-12">
-            <label class="control-label">Community Unit Name</label>
-            <input class="form-control" name="name" ng-model="unit.name" required placeholder="Commnunity Unit Name" api-checker/>
+            <label class="control-label">Community Health Unit Name</label>
+            <input class="form-control" name="name" ng-model="unit.name" required placeholder="Community Health Unit Name" api-checker/>
         </div>
         <div class="form-group col-xs-12">
             <label class="control-label">Linked Facility &#42;</label>
@@ -26,6 +29,15 @@
                     <span>{{ft.name}}</span>
                 </ui-select-choices>
             </ui-select>
+        </div>
+        <div class="form-group col-xs-12">
+            <label class="control-label">Community Health Unit Status</label>
+            <select name="status" class="form-control"  ng-model="unit.status" api-checker required>
+                <option value="">Select Status</option>
+                <option ng-repeat="a_status in unit_status" ng-selected="{{a_status.id == unit.status}}" value="{{a_status.id}}">{{a_status.name}}</option>
+            </select>
+            <span class="highlight"></span>
+            <span class="bar"></span>
         </div>
         <div class="form-group col-md-6 col-xs-12">
             <label for="established date" class="control-label">
@@ -44,17 +56,8 @@
             </datepicker>
         </div>
         <div class="form-group col-xs-12">
-            <label class="control-label">Community Unit Status</label>
-            <select name="status" class="form-control"  ng-model="unit.status" api-checker required>
-                <option value="">Select Status</option>
-                <option ng-repeat="a_status in unit_status" ng-selected="{{a_status.id == unit.status}}" value="{{a_status.id}}">{{a_status.name}}</option>
-            </select>
-            <span class="highlight"></span>
-            <span class="bar"></span>
-        </div>
-        <div class="form-group col-xs-12">
             <label class="control-label">No. of Monitored Households</label>
-            <input class="form-control" name="households_monitored" ng-model="unit.households_monitored" required placeholder="Number of Monitored Households" api-checker/>
+            <input type="number" class="form-control" name="households_monitored" ng-model="unit.households_monitored" required placeholder="Number of Monitored Households" api-checker/>
         </div>
         <div class="form-group col-xs-12">
             <label>County</label>
@@ -69,15 +72,15 @@
             <input class="form-control" readonly ng-model="unit.facility_ward">
         </div>
         <div class="form-group col-xs-12">
-            <label class="control-label">Location </label>
-            <input class="form-control" name="location" ng-model="unit.location" placeholder="Community Unit Location" api-checker/>
+            <label class="control-label">Area of coverage of community health unit</label>
+            <input class="form-control" name="location" ng-model="unit.location" placeholder="Description of the area of coverage" api-checker/>
         </div>
     </div>
     <!-- End of basic details -->
     <!-- Beggining of unit contacts -->
     <div class="col-xs-12 pad-0 custom-well">
         <div class="col-xs-12">
-            <h4 class="fw-600 fs-18"> Community Unit Contacts</h4>
+            <h4 class="fw-600 fs-18"> Community Health Unit Contacts</h4>
         </div>
         <div class="col-xs-12">
             <table class="table table-hover table-condensed custom-well col-xs-12">
@@ -90,7 +93,7 @@
                     <tr ng-repeat="unit_cont in unit.contacts">
                         <td class="col-xs-5">
                             <div class="form-group grid-inputs">
-                                <select class="form-control" name="contact_type" ng-model="unit_cont.contact_type" place-holder="Select Contact Details" api-checker>
+                                <select class="form-control" name="contact_type" ng-model="unit_cont.contact_type" place-holder="Select Contact Details" api-checker required>
                                     <option value="">Select Contact Type</option>
                                     <option ng-repeat="cont in contact_types" ng-selected="{{cont.id == unit_cont.contact_type}}" ng-value="cont.id">{{cont.name}}</option>
                                 </select>
@@ -98,7 +101,7 @@
                         </td>
                         <td>
                             <div class="form-group grid-inputs">
-                                <input class="form-control" name="contact" placeholder="Contact Details" ng-model="unit_cont.contact" api-checker>
+                                <input class="form-control" name="contact" placeholder="Contact Details" ng-model="unit_cont.contact" api-checker required>
                             </div>
                         </td>
                         <td class="col-xs-1 text-center">
@@ -107,9 +110,9 @@
                             </a>
                         </td>
                     </tr>
-                    <tr ng-if="detailed_contacts.length === 0" class="">
-                        <td colspan="3" class="text-center">
-                            <i class="fa fa-circle-o-notch fa-spin fa-2x"></i>
+                    <tr ng-if="unit.contacts.length === 0" class="">
+                        <td colspan="3" class="fs-14">
+                            <i class="fa fa-info-circle"></i> No contacts assigned to Community Health Unit
                         </td>
                     </tr>
                 </tbody>

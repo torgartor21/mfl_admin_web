@@ -86,7 +86,12 @@
         </div>
         <div class="col-xs-12 pad-0">
             <h4 ng-if="facility_changes.basic">Facility Basic Details</h4>
-            <table class="table table-hover table-condensed table-fixed">
+               <div ng-if="facility_changes.basic.length === 0 || !facility_changes.basic">
+                        <p class="col-xs-12 alert alert-info" colspan="3">
+                            <i class="fa fa-info-circle"></i> No Facility Basic Details Edited
+                        </p>
+                    </div>
+            <table class="table table-hover table-condensed table-fixed" ng-if="facility_changes.basic">
                 <thead>
                     <tr>
                         <th class="col-xs-4">Field</th>
@@ -100,22 +105,17 @@
                         <td class="col-xs-4">{{facility[change.field_name] | boolFilter}}</td>
                         <td class="col-xs-4">{{change.display_value}}</td>
                     </tr>
-                    <tr ng-if="facility_changes.basic.length === 0 || !facility_changes.basic">
-                        <td class="col-xs-12 alert alert-info" colspan="3">
-                            <i class="fa fa-info-circle"></i> No Facility Basic Details Edited
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>
         <div class="col-xs-7 pad-0" ng-class="{'vertical-divider' : (facility_changes.officer_in_charge && facility_changes.contacts.length > 0)}" ng-if="facility_changes.officer_in_charge">
-            <h4 ng-if="facility_changes.officer_in_charge">Officer Incharge</h4>
+            <h4 ng-if="facility_changes.officer_in_charge">Officer In-Charge</h4>
             <span class="pull-left col-xs-12 pad-0" ng-if="facility_changes.officer_in_charge.name">
                 <label class="text-black fw-600">Name:</label>
                     {{facility_changes.officer_in_charge.name}}
             </span>
             <span class="pull-left col-xs-12 pad-0" ng-if="facility_changes.officer_in_charge.reg_no">
-                <label class="text-black fw-600">Registration Number:</label>
+                <label class="text-black fw-600">Registration /License Number:</label>
                     {{facility_changes.officer_in_charge.reg_no}}
             </span>
             <span class="pull-left col-xs-12 pad-0" ng-if="facility_changes.officer_in_charge.job_title_name">
@@ -196,6 +196,36 @@
                 </tr>
             </table>
         </div>
+
+        <!-- Start Facility Upgrade-->
+        <div class="col-xs-12 pad-0" ng-if="facility_changes.upgrades">
+            <h4>Facility Upgrade</h4>
+            <table class="table table-hover table-condensed table-fixed">
+                <thead>
+                    <tr>
+                        <th class="col-xs-4">Field</th>
+                        <th class="col-xs-4">Old value</th>
+                        <th class="col-xs-4">New value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-xs-4">KEPH Level</td>
+                        <td class="col-xs-4">{{facility.keph_level_name}}</td>
+                        <td class="col-xs-4">{{facility_changes.upgrades.keph}}</td>
+                    </tr>
+                     <tr>
+                        <td class="col-xs-4">Facility Type</td>
+                        <td class="col-xs-4">{{facility.facility_type_name}}</td>
+                        <td class="col-xs-4">{{facility_changes.upgrades.facility_type}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>Reason for the upgrade </h4>
+            <p>{{facility_changes.upgrades.reason}}</p>
+        </div>
+        <!-- End Facility Upgrade-->
+
         <div class="col-xs-12 margin-t-20 margin-b-10 pad-0">
             <button ng-click="approveUpdate(true)" class="btn btn-success">Approve Updates</button>
             <button ng-click="approveUpdate(false)" class="btn btn-danger">Decline Updates</button>
@@ -210,11 +240,11 @@
     <!-- Overall facility approval -->
     <div class="col-xs-12 content-card margin-t-20 pad-0" ng-class="{'alert-success':facility.is_approved}" ng-if="!facility.is_approved">
         <div class="col-xs-12 margin-b-10" ng-if="!facility.is_approved && !spinner">
-            <h4 class>Approve newly created facility</h4>
+            <h4 class>Approve/Reject newly created facility</h4>
             <form name="frm_approve" role="form" ng-submit="approveFacility(stat)" novalidate>
                 <div class="form-group margin-t-10">
                     <label class="control-label">
-                        Comment for approval
+                        Facility approve/reject comment
                     </label>
                     <textarea class="form-control" name="comment" ng-model="facility_approval.comment" required api-checker rows="2">
                     </textarea>

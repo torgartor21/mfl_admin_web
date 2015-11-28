@@ -1,8 +1,26 @@
 (function(angular,_){
     "use strict";
+
+    /**
+     * @ngdoc module
+     *
+     * @name mfl.setup.keph.controllers
+     *
+     * @description
+     * Contains all the controllers used for keph setup
+     */
     angular.module("mfl.setup.keph.controllers",[
         "mfl.setup.api"
     ])
+
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.setup.controller.keph.list
+     *
+     * @description
+     * The controller used to list kephs
+     */
     .controller("mfl.setup.controller.keph.list", ["$scope",
         function ($scope) {
             $scope.title = {
@@ -17,18 +35,27 @@
                            " requires-user-feature='is_staff'" +
                            " requires-permission='facilities.add_kephlevel'",
                     class: "btn btn-primary",
-                    tipmsg: "New KEPH Level",
-                    wording: "New KEPH Level"
+                    tipmsg: "Add KEPH Level",
+                    wording: "Add KEPH Level"
                 }
             ];
         }]
     )
+
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.setup.controller.keph.create
+     *
+     * @description
+     * The controller used to create kephs
+     */
     .controller("mfl.setup.controller.keph.create",
         ["$scope", "$state", "$log", "adminApi","toasty",
          function ($scope, $state, $log, adminApi,toasty) {
             $scope.title = {
                 icon: "fa-plus-circle",
-                name: "New KEPH Level"
+                name: "Add KEPH Level"
             };
             $scope.keph = {
                 name: ""
@@ -51,6 +78,14 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.setup.controller.keph.edit
+     *
+     * @description
+     * The controller used to view/edit kephs
+     */
     .controller("mfl.setup.controller.keph.edit",
         ["$scope", "$stateParams", "$state", "$log", "adminApi","mfl.common.forms.changes","toasty",
         function ($scope, $stateParams, $state, $log, adminApi, formChanges,toasty) {

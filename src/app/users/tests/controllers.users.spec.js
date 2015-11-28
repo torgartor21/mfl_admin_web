@@ -27,8 +27,8 @@
                     multistepService = multistepService;
                     SERVER_URL = url;
                     scope.fakeStateParams = {
-                        user_id : 6,
-                        furthest : 1
+                        furthest : 1,
+                        user_id : 6
                     };
                     data = {
                         $scope : scope,
@@ -55,22 +55,477 @@
             controller("mfl.users.controllers.user_create.basic");
             expect(scope.$parent.furthest).toEqual(1);
         }]));
-        it("should test create basic details user: success",
-        inject(["$httpBackend", "$state",
-            function ($httpBackend, $state) {
-            $state.params.user_id = "18";
+        /*Test reimplementation of user_create controller*/
+        it("should test adding lines function",
+        inject(["$stateParams",function ($stateParams) {
+            $stateParams = {
+                user_id : ""
+            };
+            controller("mfl.users.controllers.user_create");
+            var obj_str = "contacts";
+            var obj_str_2 = "groups";
+            var obj_str_3 = "counties";
+            var obj_str_4 = "constituencies";
+            var obj_str_5 = "regbody";
+            scope.user = {
+                contacts : [
+                    {
+                        contact_type : "",
+                        contact_text : ""
+                    }
+                ],
+                groups : [
+                    {
+                        name : ""
+                    }
+                ],
+                user_counties : [
+                    {
+                        county : ""
+                    }
+                ],
+                user_constituencies : [
+                    {
+                        constituency : ""
+                    }
+                ],
+                regulatory_users : [
+                    {
+                        regulatory_body : ""
+                    }
+                ]
+            };
+            scope.addLine(obj_str);
+            scope.addLine(obj_str_2);
+            scope.addLine(obj_str_3);
+            scope.addLine(obj_str_4);
+            scope.addLine(obj_str_5);
+        }]));
+        it("should test removeLine function : contacts success",
+        inject(["$httpBackend", "$stateParams",
+            function ($httpBackend, $stateParams) {
+                $stateParams = {user_id : undefined};
+                controller("mfl.users.controllers.user_create");
+                scope.create = false;
+                var obj_str = "contacts";
+                var obj_without_id = {contact_type : "", contact_text : ""};
+                scope.user = {
+                    contacts : [
+                        {
+                            contact_type : "",
+                            contact_text : ""
+                        },
+                        {
+                            id : "3",
+                            contact : "6",
+                            contact_type : "5",
+                            contact_text : "test@test.com"
+                        }
+                    ]
+                };
+                scope.removeLine(obj_str, obj_without_id);
+                scope.removeLine(obj_str, scope.user.contacts[1]);
+                $httpBackend.expectDELETE(SERVER_URL +
+                    "api/common/user_contacts/3/").respond(204);
+                $httpBackend.expectDELETE(SERVER_URL +
+                    "api/common/contacts/6/").respond(204);
+                $httpBackend.flush();
+            }
+        ]));
+        it("should test removeLine function : contacts fail",
+        inject(["$httpBackend", "$stateParams",
+            function ($httpBackend, $stateParams) {
+                $stateParams = {user_id : undefined};
+                controller("mfl.users.controllers.user_create");
+                var obj_str = "contacts";
+                var obj_without_id = {contact_type : "", contact_text : ""};
+                scope.user = {
+                    contacts : [
+                        {
+                            contact_type : "",
+                            contact_text : ""
+                        },
+                        {
+                            id : "3",
+                            contact : "6",
+                            contact_type : "5",
+                            contact_text : "test@test.com"
+                        }
+                    ]
+                };
+                scope.removeLine(obj_str, obj_without_id);
+                scope.removeLine(obj_str, scope.user.contacts[1]);
+                $httpBackend.expectDELETE(SERVER_URL +
+                    "api/common/user_contacts/3/").respond(204);
+                $httpBackend.expectDELETE(SERVER_URL +
+                    "api/common/contacts/6/").respond(500);
+                $httpBackend.flush();
+            }
+        ]));
+        it("should test removeLine function : contacts total fail",
+        inject(["$httpBackend", "$stateParams",
+            function ($httpBackend, $stateParams) {
+                $stateParams = {user_id : undefined};
+                controller("mfl.users.controllers.user_create");
+                scope.create = false;
+                var obj_str = "contacts";
+                var obj_without_id = {contact_type : "", contact_text : ""};
+                scope.user = {
+                    contacts : [
+                        {
+                            contact_type : "",
+                            contact_text : ""
+                        },
+                        {
+                            id : "3",
+                            contact : "6",
+                            contact_type : "5",
+                            contact_text : "test@test.com"
+                        }
+                    ]
+                };
+                scope.removeLine(obj_str, obj_without_id);
+                scope.removeLine(obj_str, scope.user.contacts[1]);
+                $httpBackend.expectDELETE(SERVER_URL +
+                    "api/common/user_contacts/3/").respond(500);
+                $httpBackend.flush();
+            }
+        ]));
+        it("should test removing a group : success", inject(["$httpBackend",
+            "$stateParams",
+            function ($httpBackend, $stateParams) {
+                $stateParams = {user_id : 6};
+                controller("mfl.users.controllers.user_create");
+                var obj_str = "groups";
+                var obj_without_id = {id : "1", name : "", is_national : true};
+                var obj_str_2 = "counties";
+                var obj_without_id2 = {county : ""};
+                var obj_str_3 = "constituencies";
+                var obj_without_id3 = {constituency : ""};
+                var obj_str_4 = "regbody";
+                var obj_without_id4 = {regulatory_body : ""};
+                scope.groups = [
+                    {
+                        id : 3,
+                        name : "CHRIO",
+                        is_national : false,
+                        is_regulator : true
+                    },
+                    {
+                        id : 2,
+                        name : "SCHRIO",
+                        is_national : true,
+                        is_regulator : false
+                    },
+                    {
+                        id : 1,
+                        name : "Regulator",
+                        is_national : true,
+                        is_regulator : true
+                    }
+                ];
+                scope.user = {
+                    id : 6,
+                    groups : [
+                        {
+                            id : "1",
+                            name : "",
+                            is_national: true
+                        },
+                        {
+                            id : "3",
+                            name : "CHRIO",
+                            is_national : false
+                        },
+                        {
+                            id : "2",
+                            name : "SCHRIO",
+                            is_national : false
+                        }
+                    ]
+                };
+                scope.removeLine(obj_str, obj_without_id);
+                scope.removeLine(obj_str, scope.user.groups[1]);
+                scope.removeLine(obj_str_2, obj_without_id2);
+                scope.removeLine(obj_str_3, obj_without_id3);
+                scope.removeLine(obj_str_4, obj_without_id4);
+            }
+        ]));
+        it("should test removing a group : fail", inject(["$httpBackend",
+            "$stateParams",
+            function ($httpBackend, $stateParams) {
+                $stateParams = {user_id : 6};
+                controller("mfl.users.controllers.user_create");
+                var obj_str = "groups";
+                var obj_without_id = {id: "1", name : "", is_national : false};
+                var obj_str_2 = "counties";
+                var obj_without_id2 = {county : ""};
+                var obj_str_3 = "constituencies";
+                var obj_without_id3 = {constituency : ""};
+                var obj_str_4 = "regbody";
+                var obj_without_id4 = {regulatory_body : ""};
+                scope.groups = [
+                    {
+                        id : 3,
+                        name : "CHRIO",
+                        is_national : true,
+                        is_regulator : true
+                    },
+                    {
+                        id : 2,
+                        name : "SCHRIO",
+                        is_national : false,
+                        is_regulator : false
+                    },
+                    {
+                        id : 1,
+                        name : "Regulator",
+                        is_national : true,
+                        is_regulator : false
+                    }
+                ];
+                scope.user = {
+                    id : 6,
+                    groups : [
+                        {
+                            id : "1",
+                            name : "",
+                            is_national : false
+                        },
+                        {
+                            id : "3",
+                            name : "CHRIO",
+                            is_national : false
+                        },
+                        {
+                            id : "2",
+                            name : "SCHRIO",
+                            is_national : true
+                        }
+                    ]
+                };
+                scope.removeLine(obj_str, obj_without_id);
+                scope.removeLine(obj_str, scope.user.groups[1]);
+                scope.removeLine(obj_str_2, obj_without_id2);
+                scope.removeLine(obj_str_3, obj_without_id3);
+                scope.removeLine(obj_str_4, obj_without_id4);
+            }
+        ]));
+        it("should test grpChecker function", inject(["$httpBackend",
+            "$stateParams",
+            function ($httpBackend, $stateParams) {
+                $stateParams = {user_id : 6};
+                controller("mfl.users.controllers.user_create");
+                var obj_str = "groups";
+                scope.groups = [
+                    {
+                        id : 3,
+                        name : "CHRIO",
+                        is_national : false,
+                        is_regulator : true
+                    },
+                    {
+                        id : 2,
+                        name : "SCHRIO",
+                        is_national : false,
+                        is_regulator : false
+                    },
+                    {
+                        id : 1,
+                        name : "Regulator",
+                        is_national : true,
+                        is_regulator : true
+                    }
+                ];
+                scope.user = {
+                    id : 6,
+                    groups : []
+                };
+                scope.removeLine(obj_str, scope.user.groups[1]);
+            }
+        ]));
+        //should test inactivating user details
+        it("should test inactivating : success", inject(["$httpBackend",
+            "$stateParams",
+            function ($httpBackend, $stateParams) {
+                $stateParams = {user_id : 6};
+                controller("mfl.users.controllers.user_create");
+                var obj_str_2 = "user_counties";
+                var obj_two = {county : "", active : true};
+                var obj_str_3 = "user_constituencies";
+                var obj_three = {constituency : "", active : true};
+                var obj_str_4 = "regulatory_users";
+                var obj_four = {regulatory_body : "", active : true};
+                scope.groups = [
+                    {
+                        id : "3",
+                        name : "CHRIO",
+                        is_national : false,
+                        is_regulator : true
+                    }
+                ];
+                scope.user = {
+                    id : 6,
+                    user_counties : [
+                        {
+                            county : "NAIROBI"
+                        }
+                    ],
+                    user_consituencies : [
+                        {
+                            consituency : "MATHARE"
+                        }
+                    ],
+                    regulatory_users : [
+                        {
+                            regulatory_body : "KMPDB"
+                        }
+                    ]
+                };
+                scope.inactivate(obj_two, obj_str_2);
+                scope.inactivate(obj_three, obj_str_3);
+                scope.inactivate(obj_four, obj_str_4);
+                scope.inactivate(obj_four, "test");
+                $httpBackend.expectPATCH(SERVER_URL +
+                    "api/users/6/")
+                    .respond(200, {"user_counties" :scope.user.user_counties});
+                $httpBackend.flush();
+            }
+        ]));
+        it("should update mfl user details : success",
+        inject(["$httpBackend", "$state", "$stateParams",
+            function ($httpBackend, $state, $stateParams) {
+                $stateParams = {user_id : 6};
+                spyOn($state, "go");
+                controller("mfl.users.controllers.user_create");
+                scope.groups = [{id : 5, name : "CHRIO"}];
+                scope.user = {
+                    contacts : [
+                        {
+                            contact_type : "3",
+                            contact_text : "test@test.com"
+                        }
+                    ],
+                    groups : [
+                        {
+                            id : "5",
+                            name : "CHRIO"
+                        }
+                    ]
+                };
+                scope.create = false;
+                scope.save();
+                $httpBackend.expectPATCH(SERVER_URL +
+                        "api/users/6/").respond(200, scope.user);
+                $httpBackend.flush();
+            }
+        ]));
+        it("should update mfl user details : fail",
+        inject(["$httpBackend", "$state", "$stateParams",
+            function ($httpBackend, $state, $stateParams) {
+                $stateParams = {user_id : 6};
+                spyOn($state, "go");
+                controller("mfl.users.controllers.user_create");
+                scope.groups = [{id : 5, name : "CHRIO"}];
+                scope.user = {
+                    contacts : [
+                        {
+                            contact_type : "3",
+                            contact_text : "test@test.com"
+                        }
+                    ],
+                    groups : [
+                        {
+                            id : "5",
+                            name : "CHRIO"
+                        }
+                    ]
+                };
+                scope.create = false;
+                scope.save();
+                $httpBackend.expectPATCH(SERVER_URL +
+                        "api/users/6/").respond(500, scope.user);
+                $httpBackend.flush();
+            }
+        ]));
+        it("should create mfl user details : success",
+        inject(["$httpBackend", "$state", "$stateParams",
+            function ($httpBackend, $state, $stateParams) {
+                $stateParams = {user_id : undefined};
+                spyOn($state, "go");
+                controller("mfl.users.controllers.user_create");
+                scope.groups = [{id : 5, name : "CHRIO"}];
+                scope.user = {
+                    contacts : [
+                        {
+                            contact_type : "3",
+                            contact_text : "test@test.com"
+                        }
+                    ],
+                    groups : [
+                        {
+                            id : "5",
+                            name : "CHRIO"
+                        }
+                    ]
+                };
+                scope.create = true;
+                scope.save();
+                $httpBackend.expectGET(SERVER_URL +
+                        "api/facilities/job_titles/")
+                        .respond(200,{results:[]});
+                $httpBackend.expectPOST(SERVER_URL +
+                        "api/users/").respond(200, scope.user);
+                $httpBackend.flush();
+            }
+        ]));
+        it("should create mfl user details : fail",
+        inject(["$httpBackend", "$state", "$stateParams",
+            function ($httpBackend, $state, $stateParams) {
+                $stateParams = {user_id : undefined};
+                spyOn($state, "go");
+                controller("mfl.users.controllers.user_create");
+                scope.groups = [{id : 5, name : "CHRIO"}];
+                scope.user = {
+                    contacts : [
+                        {
+                            contact_type : "3",
+                            contact_text : "test@test.com"
+                        }
+                    ],
+                    groups : [
+                        {
+                            id : "5",
+                            name : "CHRIO"
+                        }
+                    ]
+                };
+                scope.create = true;
+                scope.save();
+                $httpBackend.expectGET(SERVER_URL +
+                        "api/facilities/job_titles/")
+                        .respond(500,{results:[]});
+                $httpBackend.expectPOST(SERVER_URL +
+                        "api/users/").respond(500, scope.user);
+                $httpBackend.flush();
+            }
+        ]));
+        it("should test geting user details: success",
+        inject(["$httpBackend", "$stateParams",
+            function ($httpBackend, $stateParams) {
+            $stateParams = {user_id : "6"};
             controller("mfl.users.controllers.user_create");
             $httpBackend.expectGET(SERVER_URL +
-                "api/users/18/").respond(200, {"name" : "Antony"});
+                "api/users/6/").respond(200, {"first_name" : "Antony"});
             $httpBackend.flush();
         }]));
         it("should test create basic details user: fail",
-        inject(["$httpBackend", "$state",
-            function ($httpBackend, $state) {
-            $state.params.user_id = "18";
+        inject(["$httpBackend", "$stateParams",
+            function ($httpBackend, $stateParams) {
+            $stateParams = {user_id : "6"};
             controller("mfl.users.controllers.user_create");
             $httpBackend.expectGET(SERVER_URL +
-                "api/users/18/").respond(500, {"name" : "Antony"});
+                "api/users/6/").respond(500, {"first_name" : "Antony"});
             $httpBackend.flush();
         }]));
         it("should test create basic details user: undefined",
@@ -368,6 +823,20 @@
             });
         });
 
+        describe("Testing user creation controller", function () {
+
+            it("should set stateParams to undefined", function () {
+                var scope = rootScope.$new();
+                var data = {
+                    "$scope" : scope,
+                    "$stateParams" : {
+                        user_id : undefined
+                    }
+                };
+                ctrl("user_create", data);
+            });
+        });
+
         describe("Test user edit controller while deleting", function () {
             //piggy backing on prev test
             it("should delete user",
@@ -490,8 +959,7 @@
                 httpBackend.flush();
                 httpBackend.verifyNoOutstandingExpectation();
                 httpBackend.verifyNoOutstandingRequest();
-                expect(state.go).toHaveBeenCalledWith("users."+
-                    "user_create.contacts", {"user_id": 3, "furthest" : 2});
+                expect(state.go).toHaveBeenCalledWith("users");
             });
 
             it("should show an error on save a new user", function () {
@@ -587,7 +1055,7 @@
                 function (multistepService) {
                 spyOn(log, "error");
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(500, {"error": "e"});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -620,7 +1088,7 @@
                 function (multistepService) {
                 spyOn(log, "error");
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -650,7 +1118,7 @@
             inject(["mfl.common.services.multistep",
                 function (multistepService) {
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -678,7 +1146,7 @@
             inject(["mfl.common.services.multistep",
                 function (multistepService) {
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -723,7 +1191,7 @@
                 spyOn(log, "error");
 
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -768,7 +1236,7 @@
                 spyOn(log, "error");
 
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -813,7 +1281,7 @@
             inject(["mfl.common.services.multistep",
                 function (multistepService) {
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -861,7 +1329,7 @@
                 spyOn(log, "error");
 
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -908,7 +1376,7 @@
                 spyOn(log, "error");
 
                 httpBackend
-                    .expectGET(server_url + "api/common/contact_types/")
+                    .expectGET(server_url + "api/common/contact_types/?fields=id,name")
                     .respond(200, {results: []});
                 httpBackend
                     .expectGET(server_url + "api/common/user_contacts/?user=3")
@@ -1101,8 +1569,6 @@
                 httpBackend.flush();
                 httpBackend.verifyNoOutstandingRequest();
                 httpBackend.verifyNoOutstandingExpectation();
-
-                expect(data.$scope.groups).toEqual([]);
             }]));
 
             it("should load all groups | while editing a user",
@@ -1146,8 +1612,6 @@
                 httpBackend.flush();
                 httpBackend.verifyNoOutstandingRequest();
                 httpBackend.verifyNoOutstandingExpectation();
-
-                expect(data.$scope.groups).toEqual([]);
             }]));
 
             it("should show an error on fail to load all groups",

@@ -30,14 +30,16 @@
         browser.waitForAngular();
         browser.driver.sleep(browser.params.page_timeout);
 
-        expect(element(by.linkText("Home")).isPresent()).toBe(true);
+        expect(element(by.cssContainingText(".sidebar-icon","Dashboard")).isPresent()).toBe(true);
     };
 
     var logoutUser = function (browser) {
         browser.get("/#/logout");
         browser.waitForAngular();
         browser.driver.sleep(browser.params.page_timeout);
-        expect(element(by.css("h2")).getText()).toEqual("Master Facility List V 2.0");
+        expect(element(by.css("h2")).getText()).toEqual(
+            "Kenya Master Facility and Community Units Database"
+        );
     };
 
     module.exports = {

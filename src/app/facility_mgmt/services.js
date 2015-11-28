@@ -1,11 +1,28 @@
 (function (angular) {
     "use strict";
 
+    /**
+     * @ngdoc module
+     *
+     * @name mfl.facility_mgmt.services
+     *
+     * @description
+     * Services facilitating facility management
+     */
     angular.module("mfl.facility_mgmt.services", [
         "api.wrapper",
         "mfl.auth.oauth2"
     ])
 
+    /**
+     * @ngdoc service
+     *
+     * @name mfl.facility.multistep.service
+     *
+     * @description
+     * Holds the object used to coordinate multistep navigation and
+     * functionality
+     */
     .service("mfl.facility.multistep.service", [function () {
         this.facilityObject = function () {
             var result = [
@@ -39,10 +56,18 @@
         };
     }])
 
+    /**
+     * @ngdoc service
+     *
+     * @name mfl.facility.services.wrappers
+     *
+     * @description
+     * Its service called by Facility controllers in order to fetch required
+     * data from APIs. And also all printing functionalities.
+     */
     .service("mfl.facility_mgmt.services.wrappers", ["api", "api.oauth2", "$window",
         function (api, oauth2, $window) {
             this.facilities = api.setBaseUrl("api/facilities/facilities/");
-            this.facility_detail = api.setBaseUrl("api/facilities/facilities/");
             this.facility_types = api.setBaseUrl("api/facilities/facility_types/");
             this.facility_owners = api.setBaseUrl("api/facilities/owners/");
             this.facility_owner_types = api.setBaseUrl("api/facilities/owner_types/");
@@ -53,12 +78,13 @@
             this.regulation_status = api.setBaseUrl("api/facilities/regulation_status/");
             this.wards = api.setBaseUrl("api/common/wards/");
             this.towns = api.setBaseUrl("api/common/towns");
+            this.sub_counties = api.setBaseUrl("api/common/sub_counties/");
             this.officers = api.setBaseUrl("api/facilities/officers/");
             this.contact_types = api.setBaseUrl("api/common/contact_types/");
             this.contacts = api.setBaseUrl("api/common/contacts/");
             this.physical_addresses = api.setBaseUrl("api/common/address/");
             this.facility_contacts = api.setBaseUrl("api/facilities/contacts/");
-            this.categories = api.setBaseUrl("api/facilities/service_categories/");
+            this.categories = api.setBaseUrl("api/facilities/flattened_categories/");
             this.services = api.setBaseUrl("api/facilities/services/");
             this.service_options = api.setBaseUrl("api/facilities/service_options/");
             this.options = api.setBaseUrl("api/facilities/options/");
@@ -80,6 +106,7 @@
             this.officer_contacts = api.setBaseUrl("api/facilities/officer_contacts/");
             this.keph_levels = api.setBaseUrl("api/facilities/keph/");
             this.regulator_sync = api.setBaseUrl("api/facilities/regulator_sync/");
+            this.regulator_sync_update = api.setBaseUrl("api/facilities/regulator_sync_update/");
             this.facility_rating_comments = api.setBaseUrl(
                     "api/facilities/facility_service_ratings/"
                 );
@@ -94,6 +121,10 @@
                 };
                 $window.location.href = url + "?" + helpers.makeParams(download_params);
             };
+            this.getDetailReport = function (facility_id) {
+                downloadFile("api/facilities/facility_detail_report/", facility_id);
+            };
+
             this.getCorrectionTemplate = function (facility_id) {
                 downloadFile("api/facilities/facility_correction_template/", facility_id);
             };

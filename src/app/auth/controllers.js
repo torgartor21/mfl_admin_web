@@ -1,12 +1,30 @@
 (function (angular) {
     "use strict";
 
+    /**
+     * @ngdoc module
+     *
+     * @name mfl.auth.controllers
+     *
+     * @description
+     * Controllers for the auth related views
+     *
+     */
     angular.module("mfl.auth.controllers", [
         "mfl.auth.services",
         "ui.router",
-        "ngIdle"
+        "mfl.common.errors"
     ])
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.auth.controllers.reset_pwd
+     *
+     * @description
+     * Controller for the password reset view (step 1 of the password reset
+     * flow)
+     */
     .controller("mfl.auth.controllers.reset_pwd",
         ["$scope", "$state", "$log", "mfl.auth.services.profile",
         function ($scope, $state, $log, profileService) {
@@ -23,11 +41,21 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name  mfl.auth.controllers.reset_pwd_confirm
+     *
+     * @description
+     * Controls the password reset confirmation view (step 2 of the password
+     * reset flow)
+     */
     .controller("mfl.auth.controllers.reset_pwd_confirm",
         ["$scope", "$state", "$stateParams", "$log",
-        "mfl.auth.services.profile",
-        function ($scope, $state, $stateParams, $log, profileService) {
+        "mfl.auth.services.profile", "PWD_RULE",
+        function ($scope, $state, $stateParams, $log, profileService, PR) {
             $scope.reset_pwd_confirm = function () {
+                $scope.PWD_RULE = PR;
                 profileService.resetPasswordConfirm(
                     $stateParams.uid, $stateParams.token,
                     $scope.new_password1, $scope.new_password2
@@ -50,10 +78,18 @@
         }]
     )
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.auth.controllers.login
+     *
+     * @description
+     * Manages the login view
+     */
     .controller("mfl.auth.controllers.login",
-        ["$scope", "$sce", "$state", "$stateParams", "Idle",
+        ["$scope", "$sce", "$state", "$stateParams",
         "mfl.auth.services.login", "HOME_PAGE_NAME",
-        function ($scope, $sce, $state, $stateParams, Idle, loginService, HOME_PAGE_NAME) {
+        function ($scope, $sce, $state, $stateParams, loginService, HOME_PAGE_NAME) {
             $scope.login_err = "";
             $scope.login_err_html = "";
             $scope.params = $stateParams;
@@ -69,7 +105,7 @@
                 };
                 var success_fxn = function () {
                     $scope.spinner = false;
-                    Idle.watch();
+                    loginService.startTimeout();
                     var load_state = loginService.loadState();
                     loginService.clearState();
                     if (load_state) {
@@ -89,12 +125,20 @@
         }
     ])
 
+    /**
+     * @ngdoc controller
+     *
+     * @name mfl.auth.controllers.logout
+     *
+     * @description
+     * Orchestrates the logout process and views
+     */
     .controller("mfl.auth.controllers.logout",
-        ["$scope", "$state", "$stateParams", "mfl.auth.services.login", "Idle",
-        function ($scope, $state, $stateParams, loginService, Idle) {
+        ["$scope", "$state", "$stateParams", "mfl.auth.services.login",
+        function ($scope, $state, $stateParams, loginService) {
             $scope.logout = true;
             var callback = function () {
-                Idle.unwatch();
+                loginService.stopTimeout();
                 $state.go("login", {
                     "timeout": $stateParams.timeout,
                     "change_pwd": $stateParams.change_pwd
